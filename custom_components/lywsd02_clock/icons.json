@@ -1,0 +1,36 @@
+{
+  "services": {
+    "sync_all": {
+      "service": "mdi:clock-check-outline"
+    },
+    "identify_all": {
+      "service": "mdi:map-marker-question-outline"
+    },
+    "read_sensors": {
+      "service": "mdi:thermometer-bluetooth"
+    }
+  },
+  "entity": {
+    "button": {
+      "sync_time": {
+        "default": "mdi:clock-check-outline"
+      }
+    },
+    "sensor": {
+      "drift": {
+        "default": "mdi:clock-alert-outline"
+      },
+      "last_check": {
+        "default": "mdi:clock-outline"
+      },
+      "last_sync": {
+        "default": "mdi:clock-check-outline"
+      }
+    },
+    "select": {
+      "temperature_unit": {
+        "default": "mdi:thermometer"
+      }
+    }
+  }
+}

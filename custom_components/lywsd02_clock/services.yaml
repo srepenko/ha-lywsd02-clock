@@ -1,0 +1,8 @@
+sync_all:
+  fields:
+    force:
+      default: true
+      selector:
+        boolean:
+identify_all:
+read_sensors:

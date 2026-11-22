@@ -1,0 +1,101 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "user": {
+        "description": "Choose the clock",
+        "data": {
+          "address": "Device"
+        }
+      },
+      "bluetooth_confirm": {
+        "description": "Add clock {name} ({address})? Time will be synced daily and at Home Assistant start."
+      }
+    },
+    "abort": {
+      "already_configured": "This clock is already configured",
+      "no_devices_found": "No LYWSD02 clocks found nearby",
+      "not_supported": "This device is not a LYWSD02"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Time sync",
+        "description": "Daily check: the clock is read and the time is written only if it drifted more than the threshold. If the clock advertises no temperature/humidity for the given time, they are read over a Bluetooth connection.",
+        "data": {
+          "sync_time": "Daily check time",
+          "max_drift": "Allowed drift, s",
+          "fallback_after": "Read over Bluetooth if no readings for, s"
+        }
+      }
+    }
+  },
+  "entity": {
+    "button": {
+      "sync_time": {
+        "name": "Sync time"
+      },
+      "identify": {
+        "name": "Show number"
+      }
+    },
+    "sensor": {
+      "drift": {
+        "name": "Clock drift"
+      },
+      "last_check": {
+        "name": "Last check"
+      },
+      "last_sync": {
+        "name": "Last time sync"
+      },
+      "temperature": {
+        "name": "Temperature"
+      },
+      "humidity": {
+        "name": "Humidity"
+      },
+      "battery": {
+        "name": "Battery"
+      },
+      "rssi": {
+        "name": "Signal strength"
+      }
+    },
+    "binary_sensor": {
+      "sync_problem": {
+        "name": "Sync problem"
+      }
+    },
+    "select": {
+      "temperature_unit": {
+        "name": "Temperature unit",
+        "state": {
+          "celsius": "°C",
+          "fahrenheit": "°F"
+        }
+      }
+    }
+  },
+  "services": {
+    "sync_all": {
+      "name": "Sync all clocks",
+      "description": "Write the current time to all LYWSD02 clocks.",
+      "fields": {
+        "force": {
+          "name": "Force",
+          "description": "Write the time even if the drift is within the threshold."
+        }
+      }
+    },
+    "identify_all": {
+      "name": "Show numbers on all clocks",
+      "description": "Each clock shows its own number (01:11, 02:22, ...) and °F for a minute, so you can tell which is which. The mapping appears in notifications."
+    },
+    "read_sensors": {
+      "name": "Read sensors now",
+      "description": "Connect to every clock and read temperature, humidity and battery directly (normally they come from advertisements)."
+    }
+  }
+}
