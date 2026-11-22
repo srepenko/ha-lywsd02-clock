@@ -5,11 +5,15 @@
       "user": {
         "description": "Choose the clock",
         "data": {
-          "address": "Device"
+          "address": "Device",
+          "name": "Name (e.g. room)"
         }
       },
       "bluetooth_confirm": {
-        "description": "Add clock {name} ({address})? Time will be synced daily and at Home Assistant start."
+        "description": "Add clock {name} ({address})? Time will be synced daily and at Home Assistant start.",
+        "data": {
+          "name": "Name (e.g. room)"
+        }
       }
     },
     "abort": {
@@ -26,7 +30,8 @@
         "data": {
           "sync_time": "Daily check time",
           "max_drift": "Allowed drift, s",
-          "fallback_after": "Read over Bluetooth if no readings for, s"
+          "fallback_after": "Read over Bluetooth if no readings for, s",
+          "name": "Device name"
         }
       }
     }

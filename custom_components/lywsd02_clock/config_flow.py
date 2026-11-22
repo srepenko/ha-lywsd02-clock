@@ -16,12 +16,14 @@ from homeassistant.config_entries import (
     ConfigFlowResult,
     OptionsFlow,
 )
-from homeassistant.const import CONF_ADDRESS
+from homeassistant.const import CONF_ADDRESS, CONF_NAME
 from homeassistant.core import callback
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.selector import (
     NumberSelector,
     NumberSelectorConfig,
     NumberSelectorMode,
+    TextSelector,
     TimeSelector,
 )
 
@@ -65,10 +67,11 @@ class Lywsd02ConfigFlow(ConfigFlow, domain=DOMAIN):
         assert self._discovery is not None
         address = self._discovery.address.upper()
         if user_input is not None:
-            return self.async_create_entry(title=_title(address), data={CONF_ADDRESS: address})
-        self._set_confirm_only()
+            name = (user_input.get(CONF_NAME) or "").strip() or _title(address)
+            return self.async_create_entry(title=name, data={CONF_ADDRESS: address})
         return self.async_show_form(
             step_id="bluetooth_confirm",
+            data_schema=vol.Schema({vol.Optional(CONF_NAME, default=_title(address)): TextSelector()}),
             description_placeholders={"name": _title(address), "address": address},
         )
 
@@ -79,7 +82,8 @@ class Lywsd02ConfigFlow(ConfigFlow, domain=DOMAIN):
             address = user_input[CONF_ADDRESS].upper()
             await self.async_set_unique_id(address, raise_on_progress=False)
             self._abort_if_unique_id_configured()
-            return self.async_create_entry(title=_title(address), data={CONF_ADDRESS: address})
+            name = (user_input.get(CONF_NAME) or "").strip() or _title(address)
+            return self.async_create_entry(title=name, data={CONF_ADDRESS: address})
 
         configured = self._async_current_ids(include_ignore=False)
         for info in async_discovered_service_info(self.hass, connectable=True):
@@ -92,7 +96,12 @@ class Lywsd02ConfigFlow(ConfigFlow, domain=DOMAIN):
             return self.async_abort(reason="no_devices_found")
         return self.async_show_form(
             step_id="user",
-            data_schema=vol.Schema({vol.Required(CONF_ADDRESS): vol.In(self._candidates)}),
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_ADDRESS): vol.In(self._candidates),
+                    vol.Optional(CONF_NAME): TextSelector(),
+                }
+            ),
         )
 
     @staticmethod
@@ -102,16 +111,31 @@ class Lywsd02ConfigFlow(ConfigFlow, domain=DOMAIN):
 
 
 class Lywsd02OptionsFlow(OptionsFlow):
+    def _device(self) -> dr.DeviceEntry | None:
+        devices = dr.async_entries_for_config_entry(dr.async_get(self.hass), self.config_entry.entry_id)
+        return devices[0] if devices else None
+
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         if user_input is not None:
-            return self.async_create_entry(data=user_input)
+            data = dict(user_input)
+            name = (data.pop(CONF_NAME, "") or "").strip()
+            if name:
+                # device name (all entity names follow it) + entry title; entity IDs are kept
+                if (device := self._device()) is not None and (device.name_by_user or device.name) != name:
+                    dr.async_get(self.hass).async_update_device(device.id, name_by_user=name)
+                if self.config_entry.title != name:
+                    self.hass.config_entries.async_update_entry(self.config_entry, title=name)
+            return self.async_create_entry(data=data)
         opts = self.config_entry.options
+        device = self._device()
+        current = (device.name_by_user or device.name) if device else self.config_entry.title
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema(
                 {
+                    vol.Required(CONF_NAME, default=current or self.config_entry.title): TextSelector(),
                     vol.Required(
                         CONF_SYNC_TIME, default=opts.get(CONF_SYNC_TIME, DEFAULT_SYNC_TIME)
                     ): TimeSelector(),

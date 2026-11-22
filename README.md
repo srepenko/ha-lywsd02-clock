@@ -35,7 +35,9 @@ history, rename the new entities to the old entity IDs).
   - `lywsd02_clock.read_sensors` — read temperature/humidity/battery from every clock now (returns the values)
   - `lywsd02_clock.identify_all` — every clock shows its own number for a minute; the mapping
     (number → clock → area) is shown as a notification and returned as the service response
-- Options: daily check time, allowed drift, fallback read interval.
+- **Device name**: set it when adding the clock or later in *Configure* (e.g. the room) — all entities are then
+  shown as "<name> Temperature", "<name> Clock drift", …; entity IDs are not changed.
+- Options: device name, daily check time, allowed drift, fallback read interval.
 - Diagnostics download.
 
 ## Installation
@@ -71,7 +73,8 @@ Then: *Settings → Devices & services* — discovered clocks appear automatical
 на літній/зимовий час) і після запуску Home Assistant спершу **зчитує** час із годинника і записує новий, лише якщо він відійшов
 більше ніж на поріг (типово 2 с), потім перевіряє. Надійне BLE-з'єднання з повторами (через 5 / 15 / 30 хв, якщо годинник
 недосяжний), одне з'єднання за раз, автовиявлення по Bluetooth, кнопка «Синхронізувати час», сенсори відхилення та останньої
-синхронізації, «Проблема синхронізації» з описом помилки, вибір °C/°F. Кнопка «Показати номер» і сервіс
+синхронізації, «Проблема синхронізації» з описом помилки, вибір °C/°F. Назву пристрою (наприклад, кімнату) можна задати при додаванні або потім у «Налаштувати» — усі сутності
+підписуються цією назвою. Кнопка «Показати номер» і сервіс
 «Показати номери на всіх» — годинники на хвилину показують 01:11, 02:22, … щоб знайти, де який. Якщо 5 хв немає даних
 із реклами — температура й вологість зчитуються через з'єднання; сервіс «Запросити дані зараз». Температура, вологість і батарея — з рекламних пакетів
 годинника (без з'єднання), тож вбудована Xiaomi BLE для цих годинників не потрібна.
